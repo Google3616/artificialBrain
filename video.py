@@ -63,6 +63,11 @@ class VideoProcessor:
 
         # Split into R, G, and B channels
         blue_channel, green_channel, red_channel = cv2.split(small_frame)
+        r = cv2.subtract(red_channel,cv2.divide(cv2.add(blue_channel,green_channel),2))
+        g = cv2.subtract(green_channel,(cv2.add(red_channel,blue_channel)))
+        b = cv2.subtract(blue_channel,(cv2.add(red_channel,green_channel)))
+        red_channel,green_channel,blue_channel = r,g,b
+
 
         # Apply thresholding
         red_thresh = self.apply_threshold(red_channel)

@@ -36,12 +36,29 @@ class Node:
         print(self.connected_nodes)
 
 class Web:
-    def __init__(self, size=10,n=[]):
-        """Initialize a web of interconnected nodes"""
-        if len(n) > 0:
-            self.nodes = n
-        else:
-            self.nodes = [Node(i) for i in range(size)]
+    def __init__(self, nodes):
+        self.nodes = nodes  # A dictionary of nodes with keys as (x, y, type)
+
+    def update(self, red, green, blue, edges_x, edges_y):
+        """
+        Update the neural network based on the input arrays.
+        Each array corresponds to a specific type of input and activates the respective neurons.
+        """
+        # Define a helper function to process each array
+        def process_array(array, color_type):
+            for x, row in enumerate(array):
+                for y, intensity in enumerate(row):
+                    if intensity > 0:
+                        neuron_key = (x, y, color_type)
+                        if neuron_key in self.nodes:
+                            self.nodes[neuron_key].fire(intensity)
+
+        # Process each array with the corresponding neuron type
+        process_array(red, "red")
+        process_array(green, "green")
+        process_array(blue, "blue")
+        process_array(edges_x, "vert")
+        process_array(edges_y, "horiz")
 
     def fire(self, *nodes):
         """Fire multiple nodes and update connection strengths"""
