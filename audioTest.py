@@ -2,7 +2,7 @@ from webs import *
 import audio
 import random
 neurons = {(i,t):Node(f'({i},{["Volume","Band 1", "Band 2", "Band 3", "Band 4", "Band 5", "Band 6"].index(t)})') for i in range(10) for t in ["Volume","Band 1", "Band 2", "Band 3", "Band 4", "Band 5", "Band 6"]}
-offsets = [[random.randrange(-20,20) for _ in range(10)] for _ in range(7)]
+offsets = [[(random.random()-0.25,random.random()-0.25) for _ in range(7)] for _ in range(10)]
 web = Web(list(neurons.values()))
 web.fire([neurons[1,"Volume"], neurons[5,"Band 4"]],[0.3,0.7])
 print(neurons[1,"Volume"].connected_nodes)
