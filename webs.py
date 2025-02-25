@@ -13,7 +13,7 @@ class Node:
 
     def fire(self, impulse, step=1):
         """Fire the neuron and propagate the impulse"""
-        print(f"{self.id} fired with signal {impulse} at step {step}")
+        #print(f"{self.id} fired with signal {impulse} at step {step}")
         total_connections = len(self.connected_nodes)
         if total_connections > 0 and impulse > 0.1 / total_connections:
             for node, weight in self.connected_nodes.items():
@@ -39,19 +39,23 @@ class Web:
     def __init__(self, nodes):
         self.nodes = nodes  # A dictionary of nodes with keys as (x, y, type)
 
-    def update(self, red, green, blue, edges_x, edges_y):
+    def update(self, red, green, blue, edges_x, edges_y,keys):
         """
         Update the neural network based on the input arrays.
         Each array corresponds to a specific type of input and activates the respective neurons.
         """
         # Define a helper function to process each array
+        fire = []
+        weights = []
         def process_array(array, color_type):
             for x, row in enumerate(array):
                 for y, intensity in enumerate(row):
                     if intensity > 0:
                         neuron_key = (x, y, color_type)
-                        if neuron_key in self.nodes:
-                            self.nodes[neuron_key].fire(intensity)
+                        
+                        if keys[neuron_key] in self.nodes and intensity > 125:
+                            fire.append(keys[neuron_key])
+                            weights.append(intensity/255.0)
 
         # Process each array with the corresponding neuron type
         process_array(red, "red")
@@ -59,14 +63,15 @@ class Web:
         process_array(blue, "blue")
         process_array(edges_x, "vert")
         process_array(edges_y, "horiz")
+        self.fire(fire,weights)
 
-    def fire(self, *nodes):
+    def fire(self, nodes, weights):
         """Fire multiple nodes and update connection strengths"""
         for node in nodes:
             for other in nodes:
                 if node != other:
-                    node.set_weight(other, 0.1)  # Strengthen connections
-            node.scale()  # Normalize connection weights
-        for node in nodes:
-            node.fire(1)
+                    node.set_weight(other, 1)  # Strengthen connections
+            #node.scale()  # Normalize connection weights
+        for i,node in enumerate(nodes):
+            node.fire(weights[i])
 

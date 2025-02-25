@@ -36,9 +36,9 @@ class VideoProcessor:
 
     def apply_threshold_edges(self, img, threshold=0.7):
         """Applies a fixed threshold for edge detection."""
-        img = img.astype(np.float32) / 255.0
-        img[img < threshold] = 0
-        return (img * 255).astype(np.uint8)
+        
+        img[img < 175] = 0
+        return img
 
     def update(self):
         """Captures a frame (or uses the static image), processes it, and returns five thresholded arrays."""
@@ -64,8 +64,8 @@ class VideoProcessor:
         # Split into R, G, and B channels
         blue_channel, green_channel, red_channel = cv2.split(small_frame)
         r = cv2.subtract(red_channel,cv2.divide(cv2.add(blue_channel,green_channel),2))
-        g = cv2.subtract(green_channel,(cv2.add(red_channel,blue_channel)))
-        b = cv2.subtract(blue_channel,(cv2.add(red_channel,green_channel)))
+        g = cv2.subtract(green_channel,cv2.divide(cv2.add(red_channel,blue_channel),2))
+        b = cv2.subtract(blue_channel,cv2.divide(cv2.add(red_channel,green_channel),2))
         red_channel,green_channel,blue_channel = r,g,b
 
 
@@ -76,7 +76,7 @@ class VideoProcessor:
         edges_x_thresh = self.apply_threshold_edges(edges_x)
         edges_y_thresh = self.apply_threshold_edges(edges_y)
 
-        return red_thresh, green_thresh, blue_thresh, edges_x_thresh, edges_y_thresh
+        return red_thresh, green_thresh, blue_thresh, edges_x_thresh, edges_y_thresh,small_frame
 
     def release(self):
         """Releases video capture resources."""

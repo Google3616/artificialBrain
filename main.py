@@ -38,9 +38,9 @@ while True:
     # Capture and process video frame
     result = processor.update()
     if result:
-        red, green, blue, edges_x, edges_y = result
+        red, green, blue, edges_x, edges_y, full = result
         # Update neural network based on processed video data
-        web.update(red, green, blue, edges_x, edges_y)
+        web.update(red, green, blue, edges_x, edges_y,neurons)
 
     # Create a blank canvas
     canvas = np.zeros((canvas_height, canvas_width, 3), dtype=np.uint8)
@@ -49,11 +49,18 @@ while True:
     for neuron in web.nodes:
         for connected_neuron in neuron.connected_nodes:
             # Extract grid positions from neuron IDs
-            i1, j1, _ = eval(neuron.id)
-            i2, j2, _ = eval(connected_neuron.id)
+            try:
+                i1, j1, _ = eval(neuron.id)
+            except:
+                i1,j1,_ = 1,1,0
+            try:
+                i2, j2, _ = eval(connected_neuron.id)
+            except:
+                i2,j2,_ = 1,1,0
             pt1 = get_neuron_position(i1, j1)
             pt2 = get_neuron_position(i2, j2)
-            cv2.line(canvas, pt1, pt2, connection_color, 1)
+            print(i1,j1,i2,j2)
+            cv2.line(canvas, pt1, pt2, connection_color, 2)
 
     # Draw neurons
     for neuron in web.nodes:
@@ -67,6 +74,9 @@ while True:
 
     # Display the canvas
     cv2.imshow('Neural Network Visualization', canvas)
+    cv2.imshow("og",full)
+    cv2.imshow("bl",blue)
+    cv2.imshow("gr",green)
 
     # Wait for 250 ms and check for 'q' key press to exit
     if cv2.waitKey(250) & 0xFF == ord('q'):
